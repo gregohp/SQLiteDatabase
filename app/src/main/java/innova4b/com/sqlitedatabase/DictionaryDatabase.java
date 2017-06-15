@@ -59,7 +59,7 @@ public class DictionaryDatabase extends SQLiteOpenHelper {
         values.put(FIELD_WORD, word);
         values.put(FIELD_DEFINITION, definition);
 
-        return db.update(TABLE_DICTIONARY, values, "_id = ? and word = '?'", new String[]{String.valueOf(id), word});
+        return db.update(TABLE_DICTIONARY, values, "_id = ?", new String[]{String.valueOf(id)});
 
 
     }
@@ -74,5 +74,30 @@ public class DictionaryDatabase extends SQLiteOpenHelper {
         }
 
         return returnVal;
+    }
+
+    public String getDefinition(long id){
+        String returnVal = "";
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT definition FROM " + TABLE_DICTIONARY +
+         " WHERE _id = ?", new String[]{String.valueOf(id)});
+        //db.query(TABLE_DICTIONARY, new String[]{"_id"}, " = ?", new String[]{String.valueOf(id)}, null, null, null);
+        if (cursor.getCount() == 1){
+            cursor.moveToFirst();
+            returnVal = cursor.getString(0);
+        }
+        return returnVal;
+    }
+
+    public Cursor getWordList(){
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT _id, " + FIELD_WORD + " FROM " + TABLE_DICTIONARY + " ORDER BY "+ FIELD_WORD +" ASC";
+        return db.rawQuery(query, null);
+
+    }
+
+    public int deleteRecord(long id) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.delete(TABLE_DICTIONARY, "_id = ?", new String[]{String.valueOf(id)});
     }
 }
